@@ -31,7 +31,8 @@ class OverlayView : FrameLayout {
         init(attrs, defStyle)
     }
 
-    private var image: OverlayImage? = null
+    private var selectedImage: OverlayImage? = null
+    private var addedImages: MutableList<OverlayImage> = mutableListOf()
     private lateinit var gridsLayout: GridsView
 
     private var imageX: Float = 0f
@@ -55,16 +56,16 @@ class OverlayView : FrameLayout {
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         when (event?.action) {
             MotionEvent.ACTION_DOWN -> {
-                if (isTouchInsideImage(image, event)) {
+                if (isTouchInsideImage(selectedImage, event)) {
                     isTouched = true
                 }
             }
 
             MotionEvent.ACTION_MOVE -> {
                 isMoveAction = true
-                if (isTouched && image?.isSelectedImage == true) {
-                    image?.x = event.x - imageX - imageTouchXOffset
-                    image?.y = event.y - imageY - imageTouchYOffset
+                if (isTouched && selectedImage?.isSelectedImage == true) {
+                    selectedImage?.x = event.x - imageX - imageTouchXOffset
+                    selectedImage?.y = event.y - imageY - imageTouchYOffset
                     checkDisplayGrids()
                 }
             }
@@ -72,11 +73,15 @@ class OverlayView : FrameLayout {
             MotionEvent.ACTION_UP -> {
                 isTouched = false
                 if (!isMoveAction) {
-                    if (isTouchInsideImage(image, event)) {
-                        image?.isSelectedImage = !(image?.isSelectedImage ?: false)
+                    if (isTouchInsideImage(selectedImage, event)) {
+                        selectedImage?.isSelectedImage = !(selectedImage?.isSelectedImage ?: false)
                     } else {
-                        image?.isSelectedImage = false
+                        selectedImage?.isSelectedImage = false
                     }
+                }
+
+                if (selectedImage?.isSelectedImage == false) {
+                    selectedImage = null
                 }
                 isMoveAction = false
                 checkDisplayGrids()
@@ -86,35 +91,59 @@ class OverlayView : FrameLayout {
     }
 
     private fun checkDisplayGrids() {
-        val image = image ?: return
-        val rootX = this.width / 2 / 10
-        val rootY = this.height / 2 / 10
-        val centerX = (image.x + image.width / 2).toInt() / 10
-        val centerY = (image.y + image.height / 2).toInt() / 10
+        if (selectedImage == null) {
+            gridsLayout.showCentralVentralGrid = false
+            gridsLayout.showCentralHorizontalGrid = false
+            return
+        }
+
+        val image = selectedImage ?: return
+        val rootX = this.width / 2
+        val rootY = this.height / 2
+        val centerX = (image.x + image.width / 2).toInt()
+        val centerY = (image.y + image.height / 2).toInt()
 
         gridsLayout.showCentralVentralGrid = centerX.isCloseTo(rootX) && image.isSelectedImage
         gridsLayout.showCentralHorizontalGrid = centerY.isCloseTo(rootY) && image.isSelectedImage
     }
 
     private fun isTouchInsideImage(image: OverlayImage?, event: MotionEvent): Boolean {
-        image ?: return true
+        if (image == null) {
+            selectImage(event.x, event.y)
+        }
+
         val rect = Rect()
-        image.getHitRect(rect)
+        image?.getHitRect(rect) ?: return false
         imageTouchXOffset = event.x - rect.left
         imageTouchYOffset = event.y - rect.top
-        return rect.contains(event.x.toInt(), event.y.toInt())
+        return isInsideImage(image, event.x, event.y)
+    }
+
+    private fun isInsideImage(image: OverlayImage, x: Float, y: Float): Boolean {
+        val rect = Rect()
+        image.getHitRect(rect)
+        return rect.contains(x.toInt(), y.toInt())
+    }
+
+    private fun selectImage(x: Float, y: Float): Boolean {
+        val image = addedImages.lastOrNull {
+            isInsideImage(it, x, y)
+        }
+        selectedImage = image
+        return image != null
     }
 
     fun addImageFromAssets(name: String) {
         val imageDrawable = loadImageFromAssets(name) ?: return
 
-        image = OverlayImage(context)
-        image?.let { resizeImage(it, DEFAULT_RESIZE_IMAGE_RATIO) }
-        image?.isFocusable = true
-        image?.setImageDrawable(imageDrawable)
-        addView(image)
-        imageX = image?.x ?: 0f
-        imageY = image?.y ?: 0f
+        val newImage = OverlayImage(context)
+        resizeImage(newImage, DEFAULT_RESIZE_IMAGE_RATIO)
+        newImage.isFocusable = true
+        newImage.setImageDrawable(imageDrawable)
+        addView(newImage)
+        addedImages.add(newImage)
+        newImage.x += addedImages.size * DEFAULT_OFFSET
+        newImage.y += addedImages.size * DEFAULT_OFFSET
     }
 
     private fun loadImageFromAssets(name: String): Drawable? {
@@ -150,5 +179,6 @@ class OverlayView : FrameLayout {
 
     companion object {
         const val DEFAULT_RESIZE_IMAGE_RATIO = 0.2f
+        const val DEFAULT_OFFSET = 10
     }
 }

@@ -11,9 +11,19 @@
         android:id="@+id/overlay_view"
         android:layout_width="0.dp"
         android:layout_height="0.dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/btn_add"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:contentDescription="@string/btn_add_new_image"
+        android:src="@android:drawable/ic_menu_add"
+        android:id="@+id/btn_add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
