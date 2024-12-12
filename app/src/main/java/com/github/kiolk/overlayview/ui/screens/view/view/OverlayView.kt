@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import com.github.kiolk.overlayview.R
+import com.github.kiolk.overlayview.utils.isCloseTo
 import logcat.asLog
 import logcat.logcat
 
@@ -31,6 +32,8 @@ class OverlayView : FrameLayout {
     }
 
     private var image: OverlayImage? = null
+    private lateinit var gridsLayout: GridsView
+
     private var imageX: Float = 0f
     private var imageY: Float = 0f
     private var imageTouchXOffset: Float = 0f
@@ -44,6 +47,9 @@ class OverlayView : FrameLayout {
         )
 
         a.recycle()
+        gridsLayout = GridsView(context)
+        gridsLayout.elevation = 1f
+        this.addView(gridsLayout)
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -59,6 +65,7 @@ class OverlayView : FrameLayout {
                 if (isTouched && image?.isSelectedImage == true) {
                     image?.x = event.x - imageX - imageTouchXOffset
                     image?.y = event.y - imageY - imageTouchYOffset
+                    checkDisplayGrids()
                 }
             }
 
@@ -72,9 +79,21 @@ class OverlayView : FrameLayout {
                     }
                 }
                 isMoveAction = false
+                checkDisplayGrids()
             }
         }
         return true
+    }
+
+    private fun checkDisplayGrids() {
+        val image = image ?: return
+        val rootX = this.width / 2 / 10
+        val rootY = this.height / 2 / 10
+        val centerX = (image.x + image.width / 2).toInt() / 10
+        val centerY = (image.y + image.height / 2).toInt() / 10
+
+        gridsLayout.showCentralVentralGrid = centerX.isCloseTo(rootX) && image.isSelectedImage
+        gridsLayout.showCentralHorizontalGrid = centerY.isCloseTo(rootY) && image.isSelectedImage
     }
 
     private fun isTouchInsideImage(image: OverlayImage?, event: MotionEvent): Boolean {
