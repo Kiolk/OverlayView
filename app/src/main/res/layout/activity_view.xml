@@ -8,6 +8,7 @@
     tools:context=".ui.screens.view.ViewActivity">
 
     <com.github.kiolk.overlayview.ui.screens.view.view.OverlayView
+        android:id="@+id/overlay_view"
         android:layout_width="0.dp"
         android:layout_height="0.dp"
         app:layout_constraintBottom_toBottomOf="parent"

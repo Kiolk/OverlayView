@@ -8,9 +8,13 @@ import android.graphics.drawable.Drawable
 import android.text.TextPaint
 import android.util.AttributeSet
 import android.view.View
+import android.widget.FrameLayout
+import android.widget.ImageView
 import com.github.kiolk.overlayview.R
+import logcat.asLog
+import logcat.logcat
 
-class OverlayView : View {
+class OverlayView : FrameLayout {
 
     constructor(context: Context) : super(context) {
         init(null, 0)
@@ -50,5 +54,26 @@ class OverlayView : View {
 
         val contentWidth = width - paddingLeft - paddingRight
         val contentHeight = height - paddingTop - paddingBottom
+    }
+
+    fun addImageFromAssets(name: String) {
+        val imageDrawable = loadImageFromAssets(name) ?: return
+
+        val image = ImageView(context)
+        image.setImageDrawable(imageDrawable)
+        addView(image)
+    }
+
+    private fun loadImageFromAssets(name: String): Drawable? {
+        return try {
+            val assetManager = context.assets
+            val inputStream = assetManager.open(name)
+            val drawable = Drawable.createFromStream(inputStream, null)
+            inputStream.close()
+            drawable
+        } catch (exception: Exception) {
+            logcat { exception.asLog() }
+            null
+        }
     }
 }

@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.github.kiolk.overlayview.R
+import com.github.kiolk.overlayview.ui.screens.view.view.OverlayView
 
 class ViewActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,5 +18,8 @@ class ViewActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        val overlayView = findViewById<OverlayView>(R.id.overlay_view)
+        overlayView.addImageFromAssets("images/red.png")
     }
 }
