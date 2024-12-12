@@ -8,6 +8,8 @@ import android.graphics.drawable.Drawable
 import android.text.TextPaint
 import android.util.AttributeSet
 import android.view.View
+import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import android.widget.ImageView
 import com.github.kiolk.overlayview.R
@@ -60,6 +62,7 @@ class OverlayView : FrameLayout {
         val imageDrawable = loadImageFromAssets(name) ?: return
 
         val image = ImageView(context)
+        resizeImage(image, DEFAULT_RESIZE_IMAGE_RATIO)
         image.setImageDrawable(imageDrawable)
         addView(image)
     }
@@ -75,5 +78,27 @@ class OverlayView : FrameLayout {
             logcat { exception.asLog() }
             null
         }
+    }
+
+    private fun resizeImage(image: ImageView, ratio: Float) {
+        image.viewTreeObserver.addOnGlobalLayoutListener(object :
+            ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                val width = image.width
+                val height = image.height
+                image.viewTreeObserver.removeOnGlobalLayoutListener(this)
+
+                if (width > 0 && height > 0) {
+                    val params = image.layoutParams as ViewGroup.LayoutParams
+                    params.width = (width * ratio).toInt()
+                    params.height = (height * ratio).toInt()
+                    image.layoutParams = params
+                }
+            }
+        })
+    }
+
+    companion object {
+        const val DEFAULT_RESIZE_IMAGE_RATIO = 0.4f
     }
 }
