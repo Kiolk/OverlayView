@@ -1,17 +1,13 @@
 package com.github.kiolk.overlayview.ui.screens.view.view
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
+import android.graphics.Rect
 import android.graphics.drawable.Drawable
-import android.text.TextPaint
 import android.util.AttributeSet
-import android.view.View
+import android.view.MotionEvent
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
-import android.widget.ImageView
 import com.github.kiolk.overlayview.R
 import logcat.asLog
 import logcat.logcat
@@ -34,37 +30,72 @@ class OverlayView : FrameLayout {
         init(attrs, defStyle)
     }
 
+    private var image: OverlayImage? = null
+    private var imageX: Float = 0f
+    private var imageY: Float = 0f
+    private var imageTouchXOffset: Float = 0f
+    private var imageTouchYOffset: Float = 0f
+    private var isTouched: Boolean = false
+    private var isMoveAction: Boolean = false
+
     private fun init(attrs: AttributeSet?, defStyle: Int) {
-        // Load attributes
         val a = context.obtainStyledAttributes(
             attrs, R.styleable.OverlayView, defStyle, 0
         )
 
         a.recycle()
-
     }
 
-    override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        when (event?.action) {
+            MotionEvent.ACTION_DOWN -> {
+                if (isTouchInsideImage(image, event)) {
+                    isTouched = true
+                }
+            }
 
-        // TODO: consider storing these as member variables to reduce
-        // allocations per draw cycle.
-        val paddingLeft = paddingLeft
-        val paddingTop = paddingTop
-        val paddingRight = paddingRight
-        val paddingBottom = paddingBottom
+            MotionEvent.ACTION_MOVE -> {
+                isMoveAction = true
+                if (isTouched && image?.isSelectedImage == true) {
+                    image?.x = event.x - imageX - imageTouchXOffset
+                    image?.y = event.y - imageY - imageTouchYOffset
+                }
+            }
 
-        val contentWidth = width - paddingLeft - paddingRight
-        val contentHeight = height - paddingTop - paddingBottom
+            MotionEvent.ACTION_UP -> {
+                isTouched = false
+                if (!isMoveAction) {
+                    if (isTouchInsideImage(image, event)) {
+                        image?.isSelectedImage = !(image?.isSelectedImage ?: false)
+                    } else {
+                        image?.isSelectedImage = false
+                    }
+                }
+                isMoveAction = false
+            }
+        }
+        return true
+    }
+
+    private fun isTouchInsideImage(image: OverlayImage?, event: MotionEvent): Boolean {
+        image ?: return true
+        val rect = Rect()
+        image.getHitRect(rect)
+        imageTouchXOffset = event.x - rect.left
+        imageTouchYOffset = event.y - rect.top
+        return rect.contains(event.x.toInt(), event.y.toInt())
     }
 
     fun addImageFromAssets(name: String) {
         val imageDrawable = loadImageFromAssets(name) ?: return
 
-        val image = ImageView(context)
-        resizeImage(image, DEFAULT_RESIZE_IMAGE_RATIO)
-        image.setImageDrawable(imageDrawable)
+        image = OverlayImage(context)
+        image?.let { resizeImage(it, DEFAULT_RESIZE_IMAGE_RATIO) }
+        image?.isFocusable = true
+        image?.setImageDrawable(imageDrawable)
         addView(image)
+        imageX = image?.x ?: 0f
+        imageY = image?.y ?: 0f
     }
 
     private fun loadImageFromAssets(name: String): Drawable? {
@@ -80,7 +111,7 @@ class OverlayView : FrameLayout {
         }
     }
 
-    private fun resizeImage(image: ImageView, ratio: Float) {
+    private fun resizeImage(image: OverlayImage, ratio: Float) {
         image.viewTreeObserver.addOnGlobalLayoutListener(object :
             ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
@@ -90,8 +121,8 @@ class OverlayView : FrameLayout {
 
                 if (width > 0 && height > 0) {
                     val params = image.layoutParams as ViewGroup.LayoutParams
-                    params.width = (width * ratio).toInt()
-                    params.height = (height * ratio).toInt()
+                    params.width = (height * ratio).toInt()
+                    params.height = (width * ratio).toInt()
                     image.layoutParams = params
                 }
             }
@@ -99,6 +130,6 @@ class OverlayView : FrameLayout {
     }
 
     companion object {
-        const val DEFAULT_RESIZE_IMAGE_RATIO = 0.4f
+        const val DEFAULT_RESIZE_IMAGE_RATIO = 0.2f
     }
 }
