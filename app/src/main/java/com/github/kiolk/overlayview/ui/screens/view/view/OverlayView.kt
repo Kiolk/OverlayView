@@ -94,6 +94,8 @@ class OverlayView : FrameLayout {
         if (selectedImage == null) {
             gridsLayout.showCentralVentralGrid = false
             gridsLayout.showCentralHorizontalGrid = false
+            gridsLayout.drawHorizontal(emptyList())
+            gridsLayout.drawVertical(emptyList())
             return
         }
 
@@ -105,6 +107,46 @@ class OverlayView : FrameLayout {
 
         gridsLayout.showCentralVentralGrid = centerX.isCloseTo(rootX) && image.isSelectedImage
         gridsLayout.showCentralHorizontalGrid = centerY.isCloseTo(rootY) && image.isSelectedImage
+
+
+        val verticalLines = mutableListOf<Int>()
+
+        verticalLines.addAll(getMatch(((selectedImage?.x ?: 0).toInt())))
+        verticalLines.addAll(
+            getMatch(
+                ((selectedImage?.x ?: 0).toInt() + (selectedImage?.width ?: 0))
+            )
+        )
+
+        gridsLayout.drawVertical(verticalLines)
+
+        val horizontalLines = mutableListOf<Int>()
+
+        horizontalLines.addAll(getMatch(((selectedImage?.y ?: 0).toInt()), isVertical = false))
+        horizontalLines.addAll(
+            getMatch(
+                ((selectedImage?.y ?: 0).toInt() + (selectedImage?.height ?: 0)),
+                isVertical = false,
+            )
+        )
+
+        gridsLayout.drawHorizontal(horizontalLines)
+    }
+
+    private fun getMatch(verticalValue: Int, isVertical: Boolean = true): List<Int> {
+        val hasMatch = addedImages.any {
+            val startPoint = if (isVertical) it.x.toInt() else it.y.toInt()
+            val endPoint = if (isVertical) it.width else it.height
+
+            it != selectedImage && ((startPoint + endPoint).isCloseTo(verticalValue) || startPoint
+                .isCloseTo(verticalValue))
+        }
+
+        return if (hasMatch) {
+            return listOf(verticalValue)
+        } else {
+            emptyList()
+        }
     }
 
     private fun isTouchInsideImage(image: OverlayImage?, event: MotionEvent): Boolean {

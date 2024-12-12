@@ -47,6 +47,9 @@ class GridsView : View {
             invalidate()
         }
 
+    private var verticalsCoordinates: List<Int> = emptyList()
+    private var horizontalCoordinates: List<Int> = emptyList()
+
     private fun init(attrs: AttributeSet?, defStyle: Int) {}
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -77,6 +80,18 @@ class GridsView : View {
         if (showCentralHorizontalGrid) {
             drawCenterHorizontalGrid(canvas)
         }
+
+        if(verticalsCoordinates.isNotEmpty()) {
+            verticalsCoordinates.forEach {
+                canvas.drawLine(it.toFloat(), 0f, it.toFloat(), this.height.toFloat(), paint)
+            }
+        }
+
+        if(horizontalCoordinates.isNotEmpty()) {
+            horizontalCoordinates.forEach {
+                canvas.drawLine(0f, it.toFloat(), this.width.toFloat(), it.toFloat(), paint)
+            }
+        }
     }
 
     private fun drawCentralVerticalGrid(canvas: Canvas) =
@@ -93,5 +108,13 @@ class GridsView : View {
         stopY: Float
     ) {
         canvas.drawLine(startX, startY, stopX, stopY, paint)
+    }
+
+    fun drawVertical(list: List<Int>) {
+        verticalsCoordinates = list
+    }
+
+    fun drawHorizontal(list: List<Int>) {
+        horizontalCoordinates = list
     }
 }
