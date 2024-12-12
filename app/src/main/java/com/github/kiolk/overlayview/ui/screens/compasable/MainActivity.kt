@@ -1,4 +1,4 @@
-package com.github.kiolk.overlayview
+package com.github.kiolk.overlayview.ui.screens.compasable
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
