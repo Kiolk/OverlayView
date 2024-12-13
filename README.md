@@ -25,3 +25,6 @@ This project covers different topics related to Android development. Firstly, it
 21. ⬜ Add logic for rotating elements for both solutions
 22. ⬜ Development improvements (logging, static analysis, extracting into a separate module, documentation) (optional)
 23. ⬜ Add logic to generate the final image after manipulation (optional)
+
+# Demo
+[current_state_of_development.webm](https://github.com/user-attachments/assets/aa402b70-3e6e-4a5d-8b3d-b6508676aafd)
