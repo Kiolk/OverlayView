@@ -1,7 +1,9 @@
 package com.github.kiolk.overlayview.ui.screens.view.view
 
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.graphics.Rect
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.MotionEvent
@@ -12,6 +14,7 @@ import com.github.kiolk.overlayview.R
 import com.github.kiolk.overlayview.utils.isCloseTo
 import logcat.asLog
 import logcat.logcat
+import java.io.File
 
 class OverlayView : FrameLayout {
 
@@ -175,17 +178,37 @@ class OverlayView : FrameLayout {
         return image != null
     }
 
-    fun addImageFromAssets(name: String) {
-        val imageDrawable = loadImageFromAssets(name) ?: return
+    fun addImageFromFile(file: File) {
+        loadImageFromFile(file)?.let { addImage(it) }
+    }
 
+    fun addImageFromAssets(name: String) {
+        loadImageFromAssets(name)?.let { addImage(it) }
+    }
+
+    private fun addImage(drawable: Drawable) {
         val newImage = OverlayImage(context)
         resizeImage(newImage, DEFAULT_RESIZE_IMAGE_RATIO)
         newImage.isFocusable = true
-        newImage.setImageDrawable(imageDrawable)
+        newImage.setImageDrawable(drawable)
         addView(newImage)
         addedImages.add(newImage)
         newImage.x += addedImages.size * DEFAULT_OFFSET
         newImage.y += addedImages.size * DEFAULT_OFFSET
+    }
+
+    private fun loadImageFromFile(file: File): Drawable? {
+        return try {
+            val bitmap = BitmapFactory.decodeFile(file.path)
+            if (bitmap != null) {
+                BitmapDrawable(context.resources, bitmap)
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            logcat { e.asLog() }
+            null
+        }
     }
 
     private fun loadImageFromAssets(name: String): Drawable? {

@@ -8,8 +8,10 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.github.kiolk.overlayview.R
 import com.github.kiolk.overlayview.ui.screens.view.view.OverlayView
+import com.github.kiolk.overlayview.ui.screens.view.view.OverlaysBottomSheet
 
 class ViewActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -21,11 +23,16 @@ class ViewActivity : AppCompatActivity() {
         }
 
         val overlayView = findViewById<OverlayView>(R.id.overlay_view)
-        overlayView.addImageFromAssets("images/red.png")
 
         findViewById<ImageButton>(R.id.btn_add).setOnClickListener {
-            overlayView.addImageFromAssets("images/white.png")
+            val bottomSheet = OverlaysBottomSheet {
+                overlayView.addImageFromFile(it)
+            }
+            bottomSheet.show(supportFragmentManager, BOTTOM_SHEET_TAG)
         }
+    }
 
+    private companion object {
+        const val BOTTOM_SHEET_TAG = "OverlaysBottomSheet"
     }
 }

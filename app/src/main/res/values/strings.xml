@@ -3,4 +3,6 @@
     <string name="composable_overlay_btn_home">Composable Overlay</string>
     <string name="overlay_view_btn_home">Overlay View</string>
     <string name="btn_add_new_image">Add new image</string>
+    <string name="category_image_description">Category_image</string>
+    <string name="overlay_image_description">Overlay Image</string>
 </resources>

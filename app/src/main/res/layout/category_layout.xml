@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="100dp"
+    android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_category_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/rounded_background"
+        android:padding="4dp">
+
+        <ImageView
+            android:id="@+id/iv_category"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:contentDescription="@string/category_image_description"
+            android:padding="8dp"
+            android:scaleType="centerInside"
+            app:layout_constraintBottom_toTopOf="@+id/tv_category"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_category"
+            style="@style/TextAppearance.MaterialComponents.Body1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            tools:text="Stickers" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>
