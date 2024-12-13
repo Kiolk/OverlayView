@@ -25,7 +25,7 @@ class SaveImageUseCaseImpl(private val context: Context) : SaveImageUseCase {
                 .submit()
             val bitmap = futureTarget.get()
             val file =
-                File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), DEFAULT_FILE_NAME)
+                File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "${url.hashCode()}.png")
             withContext(Dispatchers.IO) {
                 FileOutputStream(file).use { outputStream ->
                     bitmap.compress(
@@ -43,7 +43,6 @@ class SaveImageUseCaseImpl(private val context: Context) : SaveImageUseCase {
     }
 
     companion object {
-        const val DEFAULT_FILE_NAME = "image.png"
         const val QUALITY = 100
     }
 }

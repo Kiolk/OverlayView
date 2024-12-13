@@ -55,8 +55,7 @@ class CategoriesAdapter(
                 onCategoryClick(category)
             }
 
-            if (category.isSelected) {
-                container.background =
+            container.background = if (category.isSelected) {
                     ResourcesCompat.getDrawable(
                         itemView.resources,
                         R.drawable.light_rounded_background,
