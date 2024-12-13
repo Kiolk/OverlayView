@@ -3,6 +3,8 @@ package com.github.kiolk.overlayview.ui.screens.view.view
 import android.content.Context
 import android.graphics.Color
 import android.util.AttributeSet
+import androidx.core.content.res.ResourcesCompat
+import com.github.kiolk.overlayview.R
 
 class OverlayImage : androidx.appcompat.widget.AppCompatImageView {
     constructor(context: Context) : super(context) {
@@ -25,7 +27,13 @@ class OverlayImage : androidx.appcompat.widget.AppCompatImageView {
         set(value) {
             field = value
             if (value) {
-                this.setBackgroundColor(Color.RED)
+                this.setBackgroundDrawable(
+                    ResourcesCompat.getDrawable(
+                        resources,
+                        R.drawable.light_rounded_background_semi_transparent,
+                        null
+                    )
+                )
             } else {
                 this.setBackgroundColor(Color.TRANSPARENT)
             }

@@ -238,11 +238,17 @@ class OverlayView : FrameLayout {
 
     private fun addImage(drawable: Drawable, path: String = ""): OverlayImage {
         val newImage = OverlayImage(context)
-        resizeImage(newImage, DEFAULT_RESIZE_IMAGE_RATIO)
         newImage.isFocusable = true
         newImage.scaleType = ImageView.ScaleType.CENTER_INSIDE
         newImage.setImageDrawable(drawable)
         addView(newImage)
+        val width = drawable.intrinsicWidth
+        val height = drawable.intrinsicHeight
+        val layoutParams = newImage.layoutParams
+        layoutParams.width = width
+        layoutParams.height = height
+        newImage.layoutParams = layoutParams
+        resizeImage(newImage, DEFAULT_RESIZE_IMAGE_RATIO)
         newImage.x += addedImages.size * DEFAULT_OFFSET
         newImage.y += addedImages.size * DEFAULT_OFFSET
         newImage.tag = path
@@ -265,7 +271,7 @@ class OverlayView : FrameLayout {
         }
     }
 
-    private fun resizeImage(image: OverlayImage, ratio: Float) {
+    private fun resizeImage(image: OverlayImage, ratio: Int = 2) {
         image.viewTreeObserver.addOnGlobalLayoutListener(object :
             ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
@@ -275,8 +281,8 @@ class OverlayView : FrameLayout {
 
                 if (width > 0 && height > 0) {
                     val params = image.layoutParams as ViewGroup.LayoutParams
-                    params.width = (height * ratio).toInt()
-                    params.height = (width * ratio).toInt()
+                    params.width = width / ratio
+                    params.height = height / ratio
                     image.layoutParams = params
                 }
             }
@@ -308,7 +314,7 @@ class OverlayView : FrameLayout {
     ) : Parcelable
 
     companion object {
-        const val DEFAULT_RESIZE_IMAGE_RATIO = 0.2f
+        const val DEFAULT_RESIZE_IMAGE_RATIO = 2
         const val DEFAULT_OFFSET = 10
     }
 }
