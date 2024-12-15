@@ -17,7 +17,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             OverlayViewTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    OverlayComposable(modifier = Modifier.padding(innerPadding))
+                    OverlayScreen(modifier = Modifier.padding(innerPadding))
                 }
             }
         }

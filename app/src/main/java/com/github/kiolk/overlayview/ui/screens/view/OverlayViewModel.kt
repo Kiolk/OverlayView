@@ -7,6 +7,7 @@ import com.github.kiolk.overlayview.domain.useCases.GetOverlaysUseCase
 import com.github.kiolk.overlayview.domain.useCases.SaveImageUseCase
 import com.github.kiolk.overlayview.ui.mappers.toCategoryUi
 import com.github.kiolk.overlayview.ui.model.CategoryUi
+import com.github.kiolk.overlayview.ui.model.OverlayUi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.io.File
+import kotlin.random.Random
 
 class OverlayViewModel(
     private val getOverlaysUseCase: GetOverlaysUseCase,
@@ -28,6 +30,9 @@ class OverlayViewModel(
 
     private val _path = MutableSharedFlow<File>()
     val path = _path.asSharedFlow()
+
+    private val _overlayUi = MutableSharedFlow<OverlayUi>()
+    val overlayUi = _overlayUi.asSharedFlow()
 
     init {
         viewModelScope.launch {
@@ -53,7 +58,10 @@ class OverlayViewModel(
     fun onOverlayClick(overlay: Overlay) {
         viewModelScope.launch(Dispatchers.IO) {
             val path = saveImageUseCase(overlay.sourceUrl)
-            path?.let { _path.emit(it) }
+            path?.let {
+                _path.emit(it)
+                _overlayUi.emit(OverlayUi(id = Random.nextInt(), overlay, path))
+            }
         }
     }
 
